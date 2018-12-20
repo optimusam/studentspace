@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title is-1">Search Results</h1>
+        <div class="columns is-multiline">
+        {% for res in result %}
+            <div class="column is-half">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                        {{res[0].name}}
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                        <p>{{res[0].designation}}</p>
+                        <p>{{res[0].department}}</p>
+                        <p>{{res[1].name}}</p>
+                        </div>
+                    </div>
+                    <footer class="card-footer">
+                        <a href="/teacher/{{res[0].id}}" class="card-footer-item">View</a>
+                        <a href="/teacher/{{res[0].id}}/review" class="card-footer-item">Review</a>
+                    </footer>
+            </div>
+            </div>
+        {% else %}
+            <div class="notification is-danger">
+                <button class="delete"></button>
+                No such teachers found! 🙅
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
