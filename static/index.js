@@ -8,4 +8,14 @@ $(document).ready(function() {
         $(".navbar-menu").toggleClass("is-active");
   
     });
-  });
+
+    // $(".signin").click(function() {
+    //     $("#login").toggleClass("is-active");
+    // });
+    // $(".signup").click(function() {
+    //     $("#register").toggleClass("is-active");
+    // });
+    // $(".modal-close").click(function() {
+    //     $(".modal").removeClass("is-active");
+    // })
+});

@@ -6,3 +6,8 @@ body {
 .main {
     flex: 1;
 }
+.modal-content {
+    background:#fff;
+    padding:1.5em;
+    line-height:1.5em;
+  }

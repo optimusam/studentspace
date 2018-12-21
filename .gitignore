@@ -3,3 +3,6 @@ import/
 .idea/
 __pycache__/
 venv/
+.env
+node_modules/
+package-lock.json

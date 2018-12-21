@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+<link rel="stylesheet" href="{{url_for('static', filename='fontawesome-stars.css')}}">
+{% endblock %}
+{% block navbarItem %}
+<div class="buttons">
+    <a class="button is-light">
+        <strong>Hi, {{userinfo.name}}</strong>
+    </a>
+    <a href="/logout" class="button is-danger">Log out</a>
+</div>
+{% endblock %}
+{% block content %}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        {{res.name}}
+      </h1>
+      <div class="subtitle">
+        <p>{{res.designation}}</p>
+        <p>{{res.department}}</p>
+        <p>{{res.college.name}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h1 class="title is-2">Leave a review</h1>
+    <form action="teacher/{{res.id}}/review" method="post" class="review">
+      <div class="field">
+        <select id="rating" required name="rating">
+          <option disabled selected value>0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label">Course Code/Name</label>
+        <div class="control">
+          <input type="text" class="input" name="course" placeholder="The Course taught by the teacher">
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Review</label>
+        <div class="control">
+          <textarea class="textarea is-primary" name="review" placeholder="Your Review"></textarea>
+        </div>
+      </div>
+      <div class="field">
+        <div class="control">
+            <button type="submit" class="button is-info">Submit</button>
+        </div>
+      </div>
+  </form>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{url_for('static', filename='jquery.barrating.min.js')}}"></script>
+<script type="text/javascript">
+   $(function() {
+      $('#rating').barrating({
+        theme: 'fontawesome-stars'
+      });
+   });
+</script>
+{% endblock %}
+
