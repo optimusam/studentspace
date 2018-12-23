@@ -3,11 +3,11 @@ from app import app
 import json
 
 def insertCollege():
-    db.drop_all()
+    # db.drop_all(Review)
     db.create_all()
-    college = College(name="SRM Institute of Science and Technology", description="SRM Institute of Science and Technology, or Sri Ramaswamy Memorial Institute of Science and Technology, formerly known as SRM University, is a deemed university located in Kattankulathur, Tamil Nadu, India. It was founded in 1985 as SRM Engineering College in Kattankulathur, under University of Madras.", location="Kattankulathur, Tamil Nadu")
-    db.session.add(college)
-    db.session.commit()
+    # college = College(name="SRM Institute of Science and Technology", description="SRM Institute of Science and Technology, or Sri Ramaswamy Memorial Institute of Science and Technology, formerly known as SRM University, is a deemed university located in Kattankulathur, Tamil Nadu, India. It was founded in 1985 as SRM Engineering College in Kattankulathur, under University of Madras.", location="Kattankulathur, Tamil Nadu")
+    # db.session.add(college)
+    # db.session.commit()
 
 def fillData():
     fileName = ["profIT.json", "profCSE.json"]
@@ -22,7 +22,7 @@ def fillData():
 
 def main():
     insertCollege()
-    fillData()
+    # fillData()
     print("DONE!")
 
 if __name__ == "__main__":

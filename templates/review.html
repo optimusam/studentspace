@@ -4,13 +4,18 @@
 <link rel="stylesheet" href="{{url_for('static', filename='fontawesome-stars.css')}}">
 {% endblock %}
 
+
 {% block navbarItem %}
-<div class="buttons">
+    {% if islog[0] %}
+    <div class="buttons">
     <a class="button is-light">
-        <strong>Hi, {{userinfo.name}}</strong>
+        <strong>Hi, {{islog[1].name}}</strong>
     </a>
     <a href="/logout" class="button is-danger">Log out</a>
-</div>
+    </div>
+    {% else %}
+    {{super()}}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -33,7 +38,9 @@
 
 <section class="section">
   <div class="container">
-    {% if not alreadyReviewed %}
+    {% if not islog[0] %}
+    <a class="is-size-3" href="{{url_for('login')}}">Sign in to Review</a>
+    {% elif not alreadyReviewed %}
     <h1 class="title is-2">Leave a review</h1>
     <form action="/teacher/{{res.id}}/review" method="post" class="review">
       <div class="field">
@@ -60,11 +67,19 @@
       </div>
       <div class="field">
         <div class="control">
+          <label class="checkbox">
+            <input type="checkbox" name="anon" id="anon">
+            I want to review anonymously
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="control">
             <button type="submit" class="button is-info">Submit</button>
         </div>
       </div>
   </form>
-  {% else %}
+  {% else  %}
   <p class="is-size-3 has-text-success">You have already reviewed <i class="fa fa-check-circle"></i></p>
   {% endif %}
   </div>
@@ -73,6 +88,27 @@
   <div class="container">
     <h3 class="title is-3 has-text-info">{{count}} Student Reviews</h3>
     {% for review in reviews %}
+    {% if review[0]['anon'] %}
+    <div class="box">
+        <article class="media">
+          <div class="media-left">
+            <figure class="image is-64x64">
+              <img src="{{url_for('static', filename='anon.jpg')}}" alt="Image">
+            </figure>
+          </div>
+          <div class="media-content">
+            <div class="content">
+              <p>
+                <strong>{{review[0].rating}} <i class="fa fa-star has-text-warning"></i></strong> <small>[Anonymous]</small> <small>{{review[0].date.strftime('%d-%m-%Y')}}</small>
+                <br>
+                <p>Course: <strong>{{review[0].course}}</strong></p>
+                <p>{{review[0].review}}</p>
+              </p>
+            </div>
+          </div>
+        </article>
+        </div>
+    {% else %}
     <div class="box">
       <article class="media">
         <div class="media-left">
@@ -92,6 +128,7 @@
         </div>
       </article>
       </div>
+    {% endif %}
     {% else %}
       <p>Be the first to leave a review!</p>
     {% endfor %}

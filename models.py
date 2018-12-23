@@ -30,11 +30,12 @@ class User(db.Model):
 class Review(db.Model):
     __tablename__ = "reviews"
     id = db.Column(db.Integer, primary_key=True)
-    review = db.Column(db.String, nullable=False)
     rating = db.Column(db.Integer, nullable=False)
+    review = db.Column(db.String, nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
     course = db.Column(db.String, nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey("teachers.id"), nullable=False)
     user_id = db.Column(db.String, db.ForeignKey("users.id"), nullable=False)
-
+    anon = db.Column(db.Boolean, default=False)
+    
 

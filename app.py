@@ -79,7 +79,6 @@ def callback_handling():
         'name': userinfo['name'],
         'picture': userinfo['picture']
     }
-    # return redirect('/dashboard')
     return redirect(session["prevURL"], 302)
 
 @app.route("/")
@@ -107,24 +106,25 @@ def getResult():
     return render_template("result.html", title="Results", result=result, islog=isLoggedin())
 
 @app.route("/teacher/<int:teacher_id>")
-@requires_auth
 def review(teacher_id):
+    islog = isLoggedin()
+
     res = Teacher.query.get(teacher_id)
-
-    userinfo=session[constants.PROFILE_KEY]
-
-    alreadyReviewed = False
-
     reviews = db.session.query(Review, User).filter(and_(Review.user_id == User.id, Review.teacher_id == teacher_id)).all()
     review_count = len(reviews)
-    if len(reviews) > 0:
-        alreadyReviewed = True if Review.query.filter_by(user_id=userinfo['user_id'],teacher_id=teacher_id).first() != None else False
+    avgRating = "N/A"
 
+    if review_count > 0:
         avgRating = db.session.query(func.avg(Review.rating).label('average')).filter_by(teacher_id=teacher_id).first()[0]
-        
-        return render_template("review.html", title=f"Review {res.name}", avgRating=round(avgRating, 2), count=review_count, res=res, reviews=reviews, alreadyReviewed=alreadyReviewed, userinfo=userinfo)
-        
-    return render_template("review.html", title=f"Review {res.name}", avgRating="N/A", res=res, reviews=reviews, alreadyReviewed=alreadyReviewed, userinfo=userinfo)
+        avgRating = round(avgRating,2)
+
+    if not islog[0]:
+        return render_template("review.html", title=f"Review {res.name}", res=res, reviews=reviews, avgRating=avgRating, alreadyReviewed=False, islog=islog, count=review_count)
+    
+    userinfo = islog[1]
+    alreadyReviewed = True if Review.query.filter_by(user_id=userinfo['user_id'],teacher_id=teacher_id).first() != None else False
+    return render_template("review.html", title=f"Review {res.name}", avgRating=avgRating, res=res, reviews=reviews, alreadyReviewed=alreadyReviewed, userinfo=userinfo, islog=islog, count=review_count)
+            
 
 @app.route("/teacher/<int:teacher_id>/review", methods=["POST"])
 @requires_auth
@@ -133,15 +133,20 @@ def postReview(teacher_id):
     rating = request.form.get("rating")
     course = request.form.get("course").strip()
     review = request.form.get("review").strip()
+    isAnon = request.form.get("anon") != None
 
     user = User.query.get(userinfo['user_id'])
     if user is None:
-        u = User(id=userinfo['user_id'],name=userinfo["name"], picture=userinfo["picture"])
+        userID=userinfo["user_id"]
+        name = userinfo["name"]
+        if userID.startswith('email'):
+            name=name[0:3]
+        u = User(id=userID,name=name, picture=userinfo["picture"])
         db.session.add(u)
 
     r = Review.query.filter_by(user_id=userinfo['user_id'], teacher_id=teacher_id).first()
-    if r == None:
-        newReview = Review(rating=rating, review=review, course=course, user_id=userinfo['user_id'], teacher_id=teacher_id)
+    if r == None and int(rating) >= 1 and int(rating)<=5 :
+        newReview = Review(rating=rating, review=review, course=course, user_id=userinfo['user_id'], teacher_id=teacher_id, anon=isAnon)
         db.session.add(newReview)
         db.session.commit()
 
