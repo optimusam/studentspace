@@ -101,8 +101,9 @@ def logout():
 @app.route("/result", methods=["GET","POST"])
 def getResult():
     name = request.args.get("name").strip()
+    dept = request.args.get("dept").strip()
     college = request.args.get("college").strip()
-    result = db.session.query(Teacher, College).filter(and_(Teacher.college_id == College.id, Teacher.name.ilike(f"%{name}%"), College.name.ilike(f"%{college}%"))).all()
+    result = db.session.query(Teacher, College).filter(and_(Teacher.college_id == College.id, Teacher.name.ilike(f"%{name}%"),Teacher.department.ilike(f"%{dept}%"),College.name.ilike(f"%{college}%"))).all()
     return render_template("result.html", title="Results", result=result, islog=isLoggedin())
 
 @app.route("/teacher/<int:teacher_id>")
