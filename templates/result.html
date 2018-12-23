@@ -1,5 +1,18 @@
 {% extends "layout.html" %}
 
+{% block navbarItem %}
+    {% if islog[0] %}
+    <div class="buttons">
+    <a class="button is-light">
+        <strong>Hi, {{islog[1].name}}</strong>
+    </a>
+    <a href="/logout" class="button is-danger">Log out</a>
+    </div>
+    {% else %}
+    {{super()}}
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <section class="section">
     <div class="container">
@@ -27,8 +40,7 @@
             </div>
         {% else %}
             <div class="notification is-danger">
-                <button class="delete"></button>
-                No such teachers found! 🙅
+               <h3 class="title is-3">No such teacher found!</h3> 
             </div>
         {% endfor %}
         </div>

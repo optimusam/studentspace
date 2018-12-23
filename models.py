@@ -32,7 +32,7 @@ class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     review = db.Column(db.String, nullable=False)
     rating = db.Column(db.Integer, nullable=False)
-    date = db.Column(db.DateTime, default=datetime.utcnow())
+    date = db.Column(db.DateTime, default=datetime.utcnow)
     course = db.Column(db.String, nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey("teachers.id"), nullable=False)
     user_id = db.Column(db.String, db.ForeignKey("users.id"), nullable=False)

@@ -10,7 +10,6 @@ from six.moves.urllib.parse import urlencode
 from models import *
 import psycopg2
 import constants
-
 ENV_FILE = find_dotenv()
 if ENV_FILE:
     load_dotenv(ENV_FILE)
@@ -23,7 +22,6 @@ AUTH0_BASE_URL = 'https://' + AUTH0_DOMAIN
 AUTH0_AUDIENCE = env.get(constants.AUTH0_AUDIENCE)
 if AUTH0_AUDIENCE is '':
     AUTH0_AUDIENCE = AUTH0_BASE_URL + '/userinfo'
-
 
 
 app = Flask(__name__)
@@ -54,6 +52,12 @@ auth0 = oauth.register(
 )
 db.init_app(app)
 
+def isLoggedin():
+    if constants.PROFILE_KEY in session:
+        userinfo=session[constants.PROFILE_KEY]
+        return (True,userinfo)
+    return (False, None)
+
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -75,18 +79,18 @@ def callback_handling():
         'name': userinfo['name'],
         'picture': userinfo['picture']
     }
-    return redirect('/dashboard')
-
-
+    # return redirect('/dashboard')
+    return redirect(session["prevURL"], 302)
 
 @app.route("/")
 def index():
-    return render_template("index.html", title="Rate Your Professor")
+    return render_template("index.html", title="Rate My Teacher", islog=isLoggedin())
 
 @app.route("/login", methods=["GET","POST"])
 def login():
     if constants.PROFILE_KEY in session:
-        return redirect(url_for('dashboard'), 302)
+        return redirect(request.referrer, 302)
+    session["prevURL"] = request.referrer
     return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
 
 @app.route('/logout')
@@ -95,27 +99,50 @@ def logout():
     params = {'returnTo': url_for('index', _external=True), 'client_id': AUTH0_CLIENT_ID}
     return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
 
-@app.route('/dashboard')
-@requires_auth
-def dashboard():
-    return render_template('dashboard.html', title="Dashboard",
-                           userinfo=session[constants.PROFILE_KEY],
-                           userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4))
-
-@app.route("/result", methods=["POST"])
+@app.route("/result", methods=["GET","POST"])
 def getResult():
-    name = request.form.get("name").strip()
-    college = request.form.get("college").strip()
+    name = request.args.get("name").strip()
+    college = request.args.get("college").strip()
     result = db.session.query(Teacher, College).filter(and_(Teacher.college_id == College.id, Teacher.name.ilike(f"%{name}%"), College.name.ilike(f"%{college}%"))).all()
-    return render_template("result.html", title="Results", result=result)
+    return render_template("result.html", title="Results", result=result, islog=isLoggedin())
 
 @app.route("/teacher/<int:teacher_id>")
 @requires_auth
 def review(teacher_id):
     res = Teacher.query.get(teacher_id)
-    return render_template("review.html", title=f"Review {res.name}", res=res, userinfo=session[constants.PROFILE_KEY], userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD]))
 
-@app.route("/teacher/<int:teacher_id>/review")
+    userinfo=session[constants.PROFILE_KEY]
+
+    alreadyReviewed = False
+
+    reviews = db.session.query(Review, User).filter(and_(Review.user_id == User.id, Review.teacher_id == teacher_id)).all()
+    review_count = len(reviews)
+    if len(reviews) > 0:
+        alreadyReviewed = True if Review.query.filter_by(user_id=userinfo['user_id'],teacher_id=teacher_id).first() != None else False
+
+        avgRating = db.session.query(func.avg(Review.rating).label('average')).filter_by(teacher_id=teacher_id).first()[0]
+        
+        return render_template("review.html", title=f"Review {res.name}", avgRating=round(avgRating, 2), count=review_count, res=res, reviews=reviews, alreadyReviewed=alreadyReviewed, userinfo=userinfo)
+        
+    return render_template("review.html", title=f"Review {res.name}", avgRating="N/A", res=res, reviews=reviews, alreadyReviewed=alreadyReviewed, userinfo=userinfo)
+
+@app.route("/teacher/<int:teacher_id>/review", methods=["POST"])
 @requires_auth
 def postReview(teacher_id):
-    pass
+    userinfo=session[constants.PROFILE_KEY]
+    rating = request.form.get("rating")
+    course = request.form.get("course").strip()
+    review = request.form.get("review").strip()
+
+    user = User.query.get(userinfo['user_id'])
+    if user is None:
+        u = User(id=userinfo['user_id'],name=userinfo["name"], picture=userinfo["picture"])
+        db.session.add(u)
+
+    r = Review.query.filter_by(user_id=userinfo['user_id'], teacher_id=teacher_id).first()
+    if r == None:
+        newReview = Review(rating=rating, review=review, course=course, user_id=userinfo['user_id'], teacher_id=teacher_id)
+        db.session.add(newReview)
+        db.session.commit()
+
+    return redirect(f"/teacher/{teacher_id}", 302)

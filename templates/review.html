@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
 <link rel="stylesheet" href="{{url_for('static', filename='fontawesome-stars.css')}}">
 {% endblock %}
+
 {% block navbarItem %}
 <div class="buttons">
     <a class="button is-light">
@@ -11,17 +12,20 @@
     <a href="/logout" class="button is-danger">Log out</a>
 </div>
 {% endblock %}
+
 {% block content %}
 <section class="hero is-info">
   <div class="hero-body">
-    <div class="container">
-      <h1 class="title">
-        {{res.name}}
-      </h1>
-      <div class="subtitle">
-        <p>{{res.designation}}</p>
-        <p>{{res.department}}</p>
-        <p>{{res.college.name}}</p>
+    <div class="container level">
+      <div class="level-item">
+          <h1 class="title">
+            {{res.name}}
+          </h1>
+      </div>
+      <div class="level-item"><h1 class="title"><strong>{{avgRating}} <i class="fa fa-star has-text-warning"></i></strong></h1></div>
+      <div class="level-item"><strong><p>{{res.designation}}</p></strong></div>
+      <div class="level-item"><strong><p>{{res.department}}</p></strong></div>
+      <div class="level-item"><strong><p>{{res.college.name}}</p></strong></div>
       </div>
     </div>
   </div>
@@ -29,8 +33,9 @@
 
 <section class="section">
   <div class="container">
+    {% if not alreadyReviewed %}
     <h1 class="title is-2">Leave a review</h1>
-    <form action="teacher/{{res.id}}/review" method="post" class="review">
+    <form action="/teacher/{{res.id}}/review" method="post" class="review">
       <div class="field">
         <select id="rating" required name="rating">
           <option disabled selected value>0</option>
@@ -44,13 +49,13 @@
       <div class="field">
         <label class="label">Course Code/Name</label>
         <div class="control">
-          <input type="text" class="input" name="course" placeholder="The Course taught by the teacher">
+          <input type="text" required class="input" name="course" placeholder="The Course taught by the teacher">
         </div>
       </div>
       <div class="field">
         <label class="label">Review</label>
         <div class="control">
-          <textarea class="textarea is-primary" name="review" placeholder="Your Review"></textarea>
+          <textarea class="textarea is-primary" required name="review" placeholder="Your Review"></textarea>
         </div>
       </div>
       <div class="field">
@@ -59,9 +64,39 @@
         </div>
       </div>
   </form>
+  {% else %}
+  <p class="is-size-3 has-text-success">You have already reviewed <i class="fa fa-check-circle"></i></p>
+  {% endif %}
   </div>
 </section>
-
+<section class="section">
+  <div class="container">
+    <h3 class="title is-3 has-text-info">{{count}} Student Reviews</h3>
+    {% for review in reviews %}
+    <div class="box">
+      <article class="media">
+        <div class="media-left">
+          <figure class="image is-64x64">
+            <img src="{{review[1].picture}}" alt="Image">
+          </figure>
+        </div>
+        <div class="media-content">
+          <div class="content">
+            <p>
+              <strong>{{review[0].rating}} <i class="fa fa-star has-text-warning"></i></strong> <small>{{review[1].name}}</small> <small>{{review[0].date.strftime('%d-%m-%Y')}}</small>
+              <br>
+              <p>Course: <strong>{{review[0].course}}</strong></p>
+              <p>{{review[0].review}}</p>
+            </p>
+          </div>
+        </div>
+      </article>
+      </div>
+    {% else %}
+      <p>Be the first to leave a review!</p>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}
 
 {% block scripts %}
