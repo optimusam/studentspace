@@ -18,8 +18,8 @@ class Teacher(db.Model):
     department = db.Column(db.String, nullable=False)
     designation = db.Column(db.String, nullable=True)
     college_id = db.Column(db.Integer, db.ForeignKey("colleges.id"), nullable=False)
-    reviews = db.relationship("Review", backref="Teacher", lazy=True)
-    college = db.relationship("College", backref="Teacher", lazy=True)
+    reviews = db.relationship("Review", backref="teacher", lazy=True)
+    college = db.relationship("College", backref="teacher", lazy=True)
 
 class User(db.Model):
     __tablename__ = "users"

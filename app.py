@@ -30,11 +30,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = env.get("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = env.get("SECRET_KEY")
 
-@app.errorhandler(Exception)
-def handle_auth_error(ex):
-    response = jsonify(message=str(ex))
-    response.status_code = (ex.code if isinstance(ex, HTTPException) else 500)
-    return response
+# @app.errorhandler(Exception)
+# def handle_auth_error(ex):
+#     response = jsonify(message=str(ex))
+#     response.status_code = (ex.code if isinstance(ex, HTTPException) else 500)
+#     return response
 
 
 oauth = OAuth(app)
@@ -152,3 +152,14 @@ def postReview(teacher_id):
         db.session.commit()
 
     return redirect(f"/teacher/{teacher_id}", 302)
+
+@app.route("/review/recent")
+def recentReviews():
+    islog = isLoggedin()
+    res = db.session.execute("""select name, teacher_id,max(r.date)
+                                from teachers join reviews r on teachers.id = r.teacher_id
+                                group by teacher_id, name
+                                order by max(r.date) desc
+                                limit 10;""").fetchall()
+    print(res)
+    return render_template("recentReviews.html", res=res, islog=islog)
