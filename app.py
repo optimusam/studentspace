@@ -30,11 +30,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = env.get("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = env.get("SECRET_KEY")
 
-# @app.errorhandler(Exception)
-# def handle_auth_error(ex):
-#     response = jsonify(message=str(ex))
-#     response.status_code = (ex.code if isinstance(ex, HTTPException) else 500)
-#     return response
+@app.errorhandler(Exception)
+def handle_auth_error(ex):
+    response = jsonify(message=str(ex))
+    response.status_code = (ex.code if isinstance(ex, HTTPException) else 500)
+    return response
 
 
 oauth = OAuth(app)
