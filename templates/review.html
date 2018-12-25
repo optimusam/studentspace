@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block head %}
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 <link rel="stylesheet" href="{{url_for('static', filename='fontawesome-stars.css')}}">
 {% endblock %}
 
@@ -21,17 +21,16 @@
 {% block content %}
 <section class="hero is-info">
   <div class="hero-body">
-    <div class="container level">
-      <div class="level-item">
-          <h1 class="title">
-            {{res.name}}
-          </h1>
+    <div class="container">
+      <div class="title">
+        <p>{{res.name}}</p>
+        <p>{{avgRating}} <i class="fa fa-star has-text-warning"></i></p>
       </div>
-      <div class="level-item"><h1 class="title"><strong>{{avgRating}} <i class="fa fa-star has-text-warning"></i></strong></h1></div>
-      <div class="level-item"><strong><p>{{res.designation}}</p></strong></div>
-      <div class="level-item"><strong><p>{{res.department}}</p></strong></div>
-      <div class="level-item"><strong><p>{{res.college.name}}</p></strong></div>
-      </div>
+      <div class="subtitle">
+      <p><strong>{{res.designation}}</strong></p>
+      <p><strong>{{res.department.title()}}</strong></p>
+      <p><strong>{{res.college.name}}</strong></p>
+    </div>
     </div>
   </div>
 </section>
@@ -39,7 +38,7 @@
 <section class="section">
   <div class="container">
     {% if not islog[0] %}
-    <a class="is-size-3" href="{{url_for('login')}}">Sign in to Review</a>
+    <a class="is-size-4" href="{{url_for('login')}}">Sign in to Review</a>
     {% elif not alreadyReviewed %}
     <h1 class="title is-2">Leave a review</h1>
     <form action="/teacher/{{res.id}}/review" method="post" class="review">
