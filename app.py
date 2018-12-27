@@ -100,11 +100,16 @@ def logout():
 
 @app.route("/result", methods=["GET","POST"])
 def getResult():
-    name = request.args.get("name").strip()
-    dept = request.args.get("dept").strip()
-    college = request.args.get("college").strip()
-    result = db.session.query(Teacher, College).filter(and_(Teacher.college_id == College.id, Teacher.name.ilike(f"%{name}%"),Teacher.department.ilike(f"%{dept}%"),College.name.ilike(f"%{college}%"))).all()
-    return render_template("result.html", title="Results", result=result, islog=isLoggedin())
+    name = request.args.get("name").strip() or None
+    dept = request.args.get("dept").strip() or None
+    college = request.args.get("college").strip() or None
+    print(name, dept, college)
+    if name and dept and college:
+        result = db.session.query(Teacher, College).filter(and_(Teacher.college_id == College.id, Teacher.name.ilike(f"%{name}%"),Teacher.department.ilike(f"%{dept}%"),College.name.ilike(f"%{college}%"))).all()
+        return render_template("result.html", title="Results", result=result, islog=isLoggedin())
+    else:
+        flash('Please enter all the details!')
+        return redirect(url_for('index'), 302)
 
 @app.route("/teacher/<int:teacher_id>")
 def review(teacher_id):
@@ -132,8 +137,8 @@ def review(teacher_id):
 def postReview(teacher_id):
     userinfo=session[constants.PROFILE_KEY]
     rating = request.form.get("rating")
-    course = request.form.get("course").strip()
-    review = request.form.get("review").strip()
+    course = request.form.get("course").strip() or None
+    review = request.form.get("review").strip() or None
     isAnon = request.form.get("anon") != None
 
     user = User.query.get(userinfo['user_id'])
@@ -146,12 +151,14 @@ def postReview(teacher_id):
         db.session.add(u)
 
     r = Review.query.filter_by(user_id=userinfo['user_id'], teacher_id=teacher_id).first()
-    if r == None and int(rating) >= 1 and int(rating)<=5 :
+    if r == None and int(rating) >= 1 and int(rating)<=5 and review and course :
         newReview = Review(rating=rating, review=review, course=course, user_id=userinfo['user_id'], teacher_id=teacher_id, anon=isAnon)
         db.session.add(newReview)
         db.session.commit()
-
-    return redirect(f"/teacher/{teacher_id}", 302)
+        return redirect(f"/teacher/{teacher_id}", 302)
+    else :
+        flash('Please enter all the required details')
+        return redirect(f"/teacher/{teacher_id}", 302)
 
 @app.route("/review/recent")
 def recentReviews():
@@ -161,5 +168,4 @@ def recentReviews():
                                 group by teacher_id, name
                                 order by max(r.date) desc
                                 limit 10;""").fetchall()
-    print(res)
     return render_template("recentReviews.html", res=res, islog=islog)

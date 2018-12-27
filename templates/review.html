@@ -41,6 +41,11 @@
     <a class="is-size-4" href="{{url_for('login')}}">Sign in to Review</a>
     {% elif not alreadyReviewed %}
     <h1 class="title is-2">Leave a review</h1>
+    {% with message = get_flashed_messages() %}
+    {% if message %}
+    <p class="has-text-danger">{{message}}</p>
+    {% endif %}
+    {% endwith %}
     <form action="/teacher/{{res.id}}/review" method="post" class="review">
       <div class="field">
         <select id="rating" required name="rating">
