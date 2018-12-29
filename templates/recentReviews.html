@@ -1,28 +1,16 @@
 {% extends "layout.html" %}
 
-{% block navbarItem %}
-    {% if islog[0] %}
-    <div class="buttons">
-    <a class="button is-light">
-        <strong>Hi, {{islog[1].name}}</strong>
-    </a>
-    <a href="/logout" class="button is-danger">Log out</a>
-    </div>
-    {% else %}
-    {{super()}}
-    {% endif %}
-{% endblock %}
 
 {% block content %}
     <section class="section">
         <div class="container">
-            <h1 class="title has-text-info">Recently Reviewed</h1>
+            <h1 class="title">Recently Reviewed</h1>
                 <div class="columns is-multiline">
             {% for review in res %}     
             <div class="column is-6">
                 <a href="/teacher/{{review[1]}}" class="is-link">
                     <div class="box">
-                    <p class="title has-text-success">{{review[0]}}</p>
+                    <p class="title has-text-link">{{review[0]}}</p>
                     </div>
                 </a> 
             </div>

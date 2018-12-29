@@ -4,20 +4,6 @@
 <link rel="stylesheet" href="{{url_for('static', filename='fontawesome-stars.css')}}">
 {% endblock %}
 
-
-{% block navbarItem %}
-    {% if islog[0] %}
-    <div class="buttons">
-    <a class="button is-light">
-        <strong>Hi, {{islog[1].name}}</strong>
-    </a>
-    <a href="/logout" class="button is-danger">Log out</a>
-    </div>
-    {% else %}
-    {{super()}}
-    {% endif %}
-{% endblock %}
-
 {% block content %}
 <section class="hero is-info">
   <div class="hero-body">

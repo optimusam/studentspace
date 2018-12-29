@@ -103,7 +103,6 @@ def getResult():
     name = request.args.get("name").strip() or None
     dept = request.args.get("dept").strip() or None
     college = request.args.get("college").strip() or None
-    print(name, dept, college)
     if name and dept and college:
         result = db.session.query(Teacher, College).filter(and_(Teacher.college_id == College.id, Teacher.name.ilike(f"%{name}%"),Teacher.department.ilike(f"%{dept}%"),College.name.ilike(f"%{college}%"))).all()
         return render_template("result.html", title="Results", result=result, islog=isLoggedin())
@@ -163,9 +162,5 @@ def postReview(teacher_id):
 @app.route("/review/recent")
 def recentReviews():
     islog = isLoggedin()
-    res = db.session.execute("""select name, teacher_id,max(r.date)
-                                from teachers join reviews r on teachers.id = r.teacher_id
-                                group by teacher_id, name
-                                order by max(r.date) desc
-                                limit 10;""").fetchall()
-    return render_template("recentReviews.html", res=res, islog=islog)
+    res = db.session.query(Teacher.name, Teacher.id,func.max(Review.date)).filter(Review.teacher_id == Teacher.id).group_by(Teacher.name, Teacher.id).order_by(func.max(Review.date).desc()).limit(12).all()
+    return render_template("recentReviews.html", title="Recently Reviewed", res=res, islog=islog)
