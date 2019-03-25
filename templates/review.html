@@ -14,7 +14,7 @@
       </div>
       <div class="subtitle">
       <p><strong>{{res.designation}}</strong></p>
-      <p><strong>{{res.department.title()}}</strong></p>
+      <p><strong>{{res.department.upper()}}</strong></p>
       <p><strong>{{res.college.name}}</strong></p>
     </div>
     </div>
@@ -70,7 +70,27 @@
       </div>
   </form>
   {% else  %}
-  <p class="is-size-3 has-text-success">You have already reviewed <i class="fa fa-check-circle"></i></p>
+  <!-- Your Review -->
+  <h3 class="title is-title-3 has-text-info">Your Review <span class="icon edit"><i class="fa fa-pencil-square-o has-text-danger" aria-hidden="true"></i></span></h3>
+  <div class="box user-review-box">
+    <article class="media">
+      <div class="media-content">
+        <div class="content">
+          <p>
+            <strong class="user-review-rating">{{user_review.rating}}</strong><i class="fa fa-star has-text-warning"></i>
+            <small class="user-review-date">{{user_review.date.strftime('%d-%m-%Y')}}</small>
+            {% if user_review.anon %}
+            <small class="user-review-anon"><input type="checkbox" name="anon" id="anon" checked disabled>Anonymous</small>
+            {% else %}
+             <small class="user-review-anon"><input type="checkbox" name="anon" id="anon" disabled>Anonymous</small>
+            {% endif %}
+          </p>
+          <p class="user-review-course">Course: <strong>{{user_review.course}}</strong></p>
+          <p class="user-review">{{user_review.review}}</p> 
+        </div>
+      </div>
+    </article>
+  </div>
   {% endif %}
   </div>
 </section>
@@ -89,15 +109,17 @@
           <div class="media-content">
             <div class="content">
               <p>
-                <strong>{{review[0].rating}} <i class="fa fa-star has-text-warning"></i></strong> <small>[Anonymous]</small> <small>{{review[0].date.strftime('%d-%m-%Y')}}</small>
-                <br>
+                <strong class="user-review-rating">{{review[0].rating}} <i class="fa fa-star has-text-warning"></i></strong> 
+                <small>[Anonymous]</small> 
+                <small class="user-review-date">{{review[0].date.strftime('%d-%m-%Y')}}</small>
+              </p>
                 <p>Course: <strong>{{review[0].course}}</strong></p>
                 <p>{{review[0].review}}</p>
-              </p>
+              
             </div>
           </div>
         </article>
-        </div>
+    </div>
     {% else %}
     <div class="box">
       <article class="media">
@@ -109,15 +131,16 @@
         <div class="media-content">
           <div class="content">
             <p>
-              <strong>{{review[0].rating}} <i class="fa fa-star has-text-warning"></i></strong> <small>{{review[1].name}}</small> <small>{{review[0].date.strftime('%d-%m-%Y')}}</small>
-              <br>
-              <p>Course: <strong>{{review[0].course}}</strong></p>
-              <p>{{review[0].review}}</p>
+              <strong class="user-review-rating">{{review[0].rating}} <i class="fa fa-star has-text-warning"></i></strong> 
+              <small>{{review[1].name}}</small> 
+              <small class="user-review-date">{{review[0].date.strftime('%d-%m-%Y')}}</small>
             </p>
+            <p>Course: <strong>{{review[0].course}}</strong></p>
+            <p>{{review[0].review}}</p>
           </div>
         </div>
       </article>
-      </div>
+    </div>
     {% endif %}
     {% else %}
       <p>Be the first to leave a review!</p>
@@ -125,6 +148,8 @@
   </div>
 </section>
 {% endblock %}
+
+
 
 {% block scripts %}
 <script src="{{url_for('static', filename='jquery.barrating.min.js')}}"></script>

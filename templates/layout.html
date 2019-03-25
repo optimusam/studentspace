@@ -12,58 +12,57 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar is-light" role="navigation" aria-label="main navigation">
-            <div class="navbar-brand">
-              <a class="navbar-item" href="{{url_for('index')}}">
-                Rate My Teacher
-              </a>
-          
-              <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-              </a>
+    <div class="navbar-brand">
+      <a class="navbar-item" href="{{url_for('index')}}">
+        Rate My Teacher
+      </a>
+  
+      <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-start">
+        <a href="{{url_for('recentReviews')}}" class="navbar-item">Recently Reviewed</a>
+      </div>
+      <div class="navbar-end">
+        <div class="navbar-item">
+            {% block navbarItem %}
+            {% if islog[0] %}
+            <div class="buttons">
+            <a class="button is-light">
+                <strong>Hi, {{islog[1].name}}</strong>
+            </a>
+            <a href="/logout" class="button is-danger">Log out</a>
             </div>
-            
-            <div id="navbarBasicExample" class="navbar-menu">
-              <div class="navbar-start">
-                <a href="{{url_for('recentReviews')}}" class="navbar-item">Recently Reviewed</a>
-              </div>
-              <div class="navbar-end">
-                <div class="navbar-item">
-                    {% block navbarItem %}
-                    {% if islog[0] %}
-                    <div class="buttons">
-                    <a class="button is-light">
-                        <strong>Hi, {{islog[1].name}}</strong>
-                    </a>
-                    <a href="/logout" class="button is-danger">Log out</a>
-                    </div>
-                    {% else %}
-                    <a href="/login" class="button is-primary">Sign In/Up</a>
-                    {% endif %}
-                    {% endblock %}
-                </div>
-              </div>
-            </div>
-          </nav>
+            {% else %}
+            <a href="/login" class="button is-primary">Sign In/Up</a>
+            {% endif %}
+            {% endblock %}
+        </div>
+      </div>
+    </div>
+  </nav>
 
-          <!-- Content -->
-          <div class="main">
-                {% block content %} {% endblock %}
-          </div>
-          
-          <!-- Footer -->
-          <footer class="footer">
-                <p class="has-text-centered">
-                &copy;2018-∞, The Student Space
-                </p>
-            </div>
-          </footer>
+  <!-- Content -->
+  <div class="main">
+        {% block content %} {% endblock %}
+  </div>
+  
+  <!-- Footer -->
+  <footer class="footer">
+        <p class="has-text-centered">
+        &copy;2018-∞, The Student Space
+        </p>
+    </div>
+  </footer>
 
-          <!-- Scripts -->
-          <script src="{{url_for('static', filename='jquery.min.js')}}"></script>
-          {% block scripts %}{% endblock %}
-          <script src="{{url_for('static' , filename='index.js')}}"></script>
-
-        </body>
-        </html>
+  <!-- Scripts -->
+  <script src="{{url_for('static', filename='jquery.min.js')}}"></script>
+  {% block scripts %}{% endblock %}
+  <script src="{{url_for('static' , filename='index.js')}}"></script>
+</body>
+</html>

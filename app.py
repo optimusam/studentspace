@@ -127,8 +127,9 @@ def review(teacher_id):
         return render_template("review.html", title=f"Review {res.name}", res=res, reviews=reviews, avgRating=avgRating, alreadyReviewed=False, islog=islog, count=review_count)
     
     userinfo = islog[1]
-    alreadyReviewed = True if Review.query.filter_by(user_id=userinfo['user_id'],teacher_id=teacher_id).first() != None else False
-    return render_template("review.html", title=f"Review {res.name}", avgRating=avgRating, res=res, reviews=reviews, alreadyReviewed=alreadyReviewed, userinfo=userinfo, islog=islog, count=review_count)
+    user_review = Review.query.filter_by(user_id=userinfo['user_id'],teacher_id=teacher_id).first()
+    alreadyReviewed = True if user_review != None else False
+    return render_template("review.html", title=f"Review {res.name}", avgRating=avgRating, res=res, reviews=reviews, alreadyReviewed=alreadyReviewed, user_review=user_review, userinfo=userinfo, islog=islog, count=review_count)
             
 
 @app.route("/teacher/<int:teacher_id>/review", methods=["POST"])
@@ -149,12 +150,21 @@ def postReview(teacher_id):
         u = User(id=userID,name=name, picture=userinfo["picture"])
         db.session.add(u)
 
-    r = Review.query.filter_by(user_id=userinfo['user_id'], teacher_id=teacher_id).first()
-    if r == None and int(rating) >= 1 and int(rating)<=5 and review and course :
-        newReview = Review(rating=rating, review=review, course=course, user_id=userinfo['user_id'], teacher_id=teacher_id, anon=isAnon)
-        db.session.add(newReview)
-        db.session.commit()
-        return redirect(f"/teacher/{teacher_id}", 302)
+    if int(rating) >= 1 and int(rating)<=5 and review and course:
+        r = Review.query.filter_by(user_id=userinfo['user_id'], teacher_id=teacher_id).first()
+        if r == None:
+            newReview = Review(rating=rating, review=review, course=course, user_id=userinfo['user_id'], teacher_id=teacher_id, anon=isAnon)
+            db.session.add(newReview)
+            db.session.commit()
+            return redirect(f"/teacher/{teacher_id}", 302)
+        else:
+            r.rating = rating
+            r.review = review
+            r.course = course
+            r.anon = isAnon
+            r.date = datetime.utcnow()
+            db.session.commit()
+            return redirect(f"/teacher/{teacher_id}", 302)
     else :
         flash('Please enter all the required details')
         return redirect(f"/teacher/{teacher_id}", 302)

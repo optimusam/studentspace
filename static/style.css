@@ -10,4 +10,12 @@ body {
     background:#fff;
     padding:1.5em;
     line-height:1.5em;
-  }
+}
+
+.edit {
+    cursor: pointer;
+}
+
+.user-review-date {
+    float: right;
+}
